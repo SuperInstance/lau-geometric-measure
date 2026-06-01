@@ -1,0 +1,18 @@
+[package]
+name = "lau-geometric-measure"
+version = "0.1.0"
+edition = "2021"
+description = "Geometric measure theory for agents — measuring agent state spaces where classical measure theory isn't fine enough"
+license = "MIT"
+repository = "https://github.com/SuperInstance/lau-geometric-measure"
+keywords = ["geometric-measure-theory", "hausdorff", "fractal", "agent", "currents"]
+categories = ["mathematics", "science"]
+
+[dependencies]
+nalgebra = "0.33"
+serde = { version = "1", features = ["derive"] }
+num-traits = "0.2"
+approx = "0.5"
+
+[dev-dependencies]
+serde_json = "1"
