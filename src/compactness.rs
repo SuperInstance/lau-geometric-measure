@@ -211,9 +211,9 @@ pub fn isoperimetric_inequality(current: &Current, k: usize) -> IsoperimetricRes
     // If current is a cycle, it bounds some surface
     let is_cycle = current.is_cycle();
 
-    let (filling_mass, constant) = if is_cycle && k >= 2 {
+    let (filling_mass, constant) = if is_cycle && k >= 1 {
         let c = isoperimetric_constant(k);
-        let fill_mass = c * mass.powf(k as f64 / (k - 1) as f64);
+        let fill_mass = c * mass.powf((k + 1) as f64 / k.max(1) as f64);
         (fill_mass, c)
     } else {
         (0.0, 0.0)

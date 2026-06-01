@@ -124,7 +124,7 @@ impl Varifold {
     pub fn density_ratio(&self, center: &Point, radius: f64, k: usize) -> f64 {
         let r2 = radius * radius;
         let mass_in_ball: f64 = self.elements.iter()
-            .filter(|e| (e.point - center).norm_squared() <= r2)
+            .filter(|e| (&e.point - center).norm_squared() <= r2)
             .map(|e| e.weight)
             .sum();
 
@@ -165,7 +165,7 @@ impl Varifold {
             let n = self.elements.len().max(other.elements.len());
             for elem in &self.elements {
                 let min_d = other.elements.iter()
-                    .map(|e| (e.point - elem.point).norm())
+                    .map(|e| (&e.point - &elem.point).norm())
                     .fold(f64::INFINITY, f64::min);
                 total += min_d * elem.weight;
             }
@@ -214,7 +214,7 @@ pub fn varifold_from_pointcloud(
 
     for i in 0..points.len() {
         let neighbors: Vec<usize> = points.iter().enumerate()
-            .filter(|(j, p)| *j != i && (p - &points[i]).norm_squared() <= neighborhood_radius * neighborhood_radius)
+            .filter(|(j, p)| *j != i && (*p - &points[i]).norm_squared() <= neighborhood_radius * neighborhood_radius)
             .map(|(j, _)| j)
             .collect();
 

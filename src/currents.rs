@@ -32,7 +32,7 @@ impl Simplex {
     pub fn volume(&self) -> f64 {
         let k = self.dimension();
         if k == 0 {
-            return 1.0 * self.orientation;
+            return 1.0; // unsigned geometric volume
         }
 
         // Volume = |det of edge vectors| / k!
@@ -55,7 +55,7 @@ impl Simplex {
         }
 
         let det = determinant(&gram);
-        (det.abs().sqrt() / factorial(k) as f64) * self.orientation.abs()
+        det.abs().sqrt() / factorial(k) as f64
     }
 
     /// Compute the boundary of this simplex (a (k-1)-current).
@@ -135,6 +135,7 @@ impl Current {
 
     /// Compute the boundary: ∂T = Σ ∂(each simplex).
     /// By the boundary operator, ∂∘∂ = 0.
+    /// Consolidates (cancels) simplices with identical vertices.
     pub fn boundary(&self) -> Current {
         let mut result = Current::zero();
         for simplex in &self.simplices {
@@ -143,12 +144,35 @@ impl Current {
                 result.add(s);
             }
         }
-        result
+        result.consolidate()
     }
 
-    /// Mass of the current: M(T) = Σ |volume(s_i)|.
+    /// Consolidate simplices with identical vertex positions.
+    /// Merges orientations; removes simplices whose orientation cancels to ~0.
+    pub fn consolidate(&self) -> Current {
+        let mut groups: Vec<(Vec<Point>, f64)> = Vec::new();
+        'outer: for s in &self.simplices {
+            for (g_verts, g_orient) in &mut groups {
+                if g_verts.len() != s.vertices.len() { continue; }
+                let all_match = g_verts.iter().zip(s.vertices.iter())
+                    .all(|(a, b)| (a - b).norm() < 1e-10);
+                if all_match {
+                    *g_orient += s.orientation;
+                    continue 'outer;
+                }
+            }
+            groups.push((s.vertices.clone(), s.orientation));
+        }
+        let simplices: Vec<Simplex> = groups.into_iter()
+            .filter(|(_, w)| w.abs() > 1e-10)
+            .map(|(v, o)| Simplex::new(v, o))
+            .collect();
+        Current { simplices }
+    }
+
+    /// Mass of the current: M(T) = Σ |orientation_i| * volume_i.
     pub fn mass(&self) -> f64 {
-        self.simplices.iter().map(|s| s.volume()).sum()
+        self.simplices.iter().map(|s| s.orientation.abs() * s.volume()).sum()
     }
 
     /// Flat norm: F(T) = inf { M(A) + M(B) : T = A + ∂B }.
@@ -230,7 +254,7 @@ pub fn flat_distance(t1: &Current, t2: &Current) -> f64 {
     for s in &t2.simplices {
         diff.add(Simplex::new(s.vertices.clone(), -s.orientation));
     }
-    diff.flat_norm()
+    diff.consolidate().flat_norm()
 }
 
 /// The support of a current (as a set of centroids of simplices).

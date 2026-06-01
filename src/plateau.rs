@@ -112,7 +112,7 @@ pub fn solve_plateau_varifold(
     PlateauSolution {
         surface,
         area,
-        boundary: boundary_simplices.first().map(|_| Current::zero()).unwrap_or_default(),
+        boundary: boundary_simplices.first().map(|_| Current::zero()).unwrap_or_else(Current::zero),
         iterations: max_iterations,
         converged: false,
     }

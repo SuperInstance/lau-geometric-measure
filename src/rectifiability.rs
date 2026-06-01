@@ -74,7 +74,7 @@ pub fn test_rectifiability(
         if total < 1e-15 {
             continue;
         }
-        let top_k_sum: f64 = eigenvalues.iter().rev().take(k).sum();
+        let top_k_sum: f64 = eigenvalues.iter().take(k).sum();
         tangent_qualities.push(top_k_sum / total);
 
         // Estimate local dimension via eigenvalue gap
@@ -194,7 +194,7 @@ pub fn decompose_rectifiability(
             unrectifiable.push(idx);
             continue;
         }
-        let top_k: f64 = eigenvalues.iter().rev().take(k).sum();
+        let top_k: f64 = eigenvalues.iter().take(k).sum();
         let quality = top_k / total;
 
         if quality > threshold {
@@ -243,7 +243,7 @@ fn find_neighbors(points: &[Point], center_idx: usize, radius: f64) -> Vec<usize
         .iter()
         .enumerate()
         .filter(|(i, p)| {
-            *i != center_idx && (p - center).norm_squared() <= r2
+            *i != center_idx && (*p - center).norm_squared() <= r2
         })
         .map(|(i, _)| i)
         .collect()
