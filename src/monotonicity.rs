@@ -4,7 +4,6 @@
 //! is non-decreasing in r. This is fundamental to regularity theory.
 //! Equality at some r1 < r2 implies the surface is a cone over x.
 
-use nalgebra::DVector;
 use serde::{Serialize, Deserialize};
 use crate::currents::Current;
 use crate::varifolds::Varifold;
@@ -74,7 +73,7 @@ pub fn check_monotonicity_varifold(
     k: usize,
     radii: &[f64],
 ) -> MonotonicityResult {
-    let omega_k = crate::hausdorff::volume_unit_ball(k as f64);
+    let _omega_k = crate::hausdorff::volume_unit_ball(k as f64);
     let mut density_ratios: Vec<(f64, f64)> = Vec::new();
 
     for &r in radii {
@@ -152,18 +151,16 @@ pub fn is_cone(
 pub fn tangent_cone(
     current: &Current,
     center: &Point,
-    k: usize,
+    _k: usize,
 ) -> Current {
     // Blow up at successively smaller scales and take the limit
     let scales = vec![1.0, 0.5, 0.1, 0.05, 0.01];
     let mut best = current.clone();
-    let mut best_scale = 1.0;
 
     for &s in &scales {
         let blown = blow_up(current, center, s);
         if blown.mass() > 0.0 {
             best = blown;
-            best_scale = s;
         }
     }
 
@@ -248,6 +245,7 @@ fn extrapolate_to_zero(data: &[(f64, f64)]) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use nalgebra::DVector;
     use crate::currents::Simplex;
 
     fn pt(x: f64, y: f64) -> Point {

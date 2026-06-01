@@ -5,7 +5,6 @@
 //! The Hausdorff dimension is the critical s where the measure jumps from ∞ to 0.
 
 use nalgebra::DVector;
-use num_traits::Float;
 use serde::{Serialize, Deserialize};
 // use std::fmt;
 
@@ -90,7 +89,7 @@ pub fn hausdorff_dimension(points: &[Point], min_epsilon: f64, max_epsilon: f64,
     let log_max = max_epsilon.ln();
     let step = (log_max - log_min) / (num_scales - 1) as f64;
 
-    let mut scale_data: Vec<(f64, f64)> = (0..num_scales)
+    let scale_data: Vec<(f64, f64)> = (0..num_scales)
         .map(|i| {
             let eps = (log_min + step * i as f64).exp();
             let n = greedy_covering_count(points, eps);
@@ -99,7 +98,6 @@ pub fn hausdorff_dimension(points: &[Point], min_epsilon: f64, max_epsilon: f64,
         .collect();
 
     // Linear regression: log(N) = dim * log(1/ε) + c
-    let n = scale_data.len() as f64;
     let (slope, r_squared) = linear_regression(
         &scale_data.iter().map(|&(eps, _)| -eps.ln()).collect::<Vec<_>>(),
         &scale_data.iter().map(|&(_, count)| count.ln()).collect::<Vec<_>>(),
@@ -108,7 +106,7 @@ pub fn hausdorff_dimension(points: &[Point], min_epsilon: f64, max_epsilon: f64,
     // Filter out degenerate cases
     let valid = scale_data.iter().all(|&(_, c)| c > 0.0);
     let dimension = if valid && slope.is_finite() { slope } else { 0.0 };
-    let confidence = if valid { r_squared.max(0.0).min(1.0) } else { 0.0 };
+    let confidence = if valid { r_squared.clamp(0.0, 1.0) } else { 0.0 };
 
     HausdorffDimensionResult {
         dimension,
@@ -248,12 +246,14 @@ fn cluster_diameter(points: &[Point], indices: &[usize]) -> f64 {
 }
 
 // Override the clustering to use the real diameter function
+#[allow(dead_code)]
 fn epsilon_clustering_with_diameters(points: &[Point], epsilon: f64) -> Vec<f64> {
     let clusters = epsilon_clustering(points, epsilon);
     clusters.iter().map(|c| cluster_diameter(points, c)).collect()
 }
 
 /// Use epsilon_clustering_with_diameters in precise measure.
+#[allow(dead_code)]
 fn hausdorff_measure_precise_impl(points: &[Point], s: f64, epsilon: f64) -> f64 {
     if points.is_empty() || epsilon <= 0.0 {
         return 0.0;
@@ -287,15 +287,15 @@ fn gamma(z: f64) -> f64 {
     let z = z - 1.0;
     let g = 7.0;
     let coef = [
-        0.99999999999980993,
-        676.5203681218851,
-        -1259.1392167224028,
-        771.32342877765313,
-        -176.61502916214059,
-        12.507343278686905,
-        -0.13857109526572012,
-        9.9843695780195716e-6,
-        1.5056327351493116e-7,
+        0.999_999_999_999_809_9,
+        676.520_368_121_885_1,
+        -1_259.139_216_722_402_8,
+        771.323_428_777_653_1,
+        -176.615_029_162_140_6,
+        12.507_343_278_686_905,
+        -0.138_571_095_265_720_12,
+        9.984_369_578_019_572e-6,
+        1.505_632_735_149_311_6e-7,
     ];
     let x = coef[0]
         + coef.iter().skip(1).enumerate().fold(0.0, |acc, (i, &c)| {

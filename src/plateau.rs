@@ -7,7 +7,6 @@
 use nalgebra::DVector;
 use serde::{Serialize, Deserialize};
 use crate::currents::{Current, Simplex};
-use crate::varifolds::Varifold;
 use crate::hausdorff::Point;
 
 /// Result of solving the Plateau problem.

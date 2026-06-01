@@ -67,7 +67,7 @@ impl Simplex {
 
         let mut simplices = Vec::new();
         for i in 0..=k {
-            let mut face_verts: Vec<Point> = self.vertices.iter()
+            let face_verts: Vec<Point> = self.vertices.iter()
                 .enumerate()
                 .filter(|&(j, _)| j != i)
                 .map(|(_, v)| v.clone())
@@ -188,7 +188,7 @@ impl Current {
         // Lower bound on flat norm
         // F(T) ≥ sup { T(ω) : |ω| ≤ 1, |dω| ≤ 1 }
         // Approximate by mass / 2
-        let lower_bound = mass_bound / 2.0;
+        let _lower_bound = mass_bound / 2.0;
 
         // For a current with zero boundary, flat norm = mass
         if bdry_mass < 1e-10 {
@@ -287,6 +287,7 @@ fn determinant(matrix: &[Vec<f64>]) -> f64 {
     det
 }
 
+#[allow(clippy::needless_range_loop)]
 fn minor_matrix(matrix: &[Vec<f64>], row: usize, col: usize) -> Vec<Vec<f64>> {
     let n = matrix.len();
     let mut result = Vec::new();

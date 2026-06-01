@@ -85,7 +85,7 @@ impl Varifold {
     pub fn first_variation(&self, vector_field: &dyn Fn(&Point) -> DVector<f64>) -> f64 {
         let mut total = 0.0;
         for elem in &self.elements {
-            let x = vector_field(&elem.point);
+            let _x = vector_field(&elem.point);
             // Approximate divergence in tangent space
             let div = self.approximate_divergence(&elem.point, &elem.tangent_basis, vector_field);
             total -= elem.weight * div;
@@ -114,9 +114,7 @@ impl Varifold {
                 }
             }
 
-            // Project onto normal space
-            let normal_component = project_to_normal(&curvature, &elem.tangent_basis);
-            normal_component
+            project_to_normal(&curvature, &elem.tangent_basis)
         }).collect()
     }
 
@@ -162,7 +160,7 @@ impl Varifold {
         } else {
             // Simple: average nearest neighbor distance
             let mut total = 0.0;
-            let n = self.elements.len().max(other.elements.len());
+            let _n = self.elements.len().max(other.elements.len());
             for elem in &self.elements {
                 let min_d = other.elements.iter()
                     .map(|e| (&e.point - &elem.point).norm())
@@ -237,7 +235,7 @@ pub fn varifold_from_pointcloud(
 
 fn estimate_tangent_space(
     points: &[Point],
-    center_idx: usize,
+    _center_idx: usize,
     neighbors: &[usize],
     k: usize,
 ) -> Vec<DVector<f64>> {

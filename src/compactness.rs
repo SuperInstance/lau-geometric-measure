@@ -4,7 +4,6 @@
 //! is compact in the flat norm topology. This means limits of currents exist,
 //! which is essential for existence proofs in geometric measure theory.
 
-use nalgebra::DVector;
 use serde::{Serialize, Deserialize};
 use crate::currents::{Current, Simplex, flat_distance};
 use crate::hausdorff::Point;
@@ -272,6 +271,7 @@ fn isoperimetric_constant(k: usize) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use nalgebra::DVector;
 
     fn pt(x: f64, y: f64) -> Point {
         DVector::from_vec(vec![x, y])

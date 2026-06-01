@@ -275,9 +275,9 @@ fn local_pca(points: &[Point], indices: &[usize]) -> (Vec<f64>, Vec<DVector<f64>
             }
         }
     }
-    for i in 0..dim {
-        for j in 0..dim {
-            cov[i][j] /= n;
+    for row in cov.iter_mut() {
+        for val in row.iter_mut() {
+            *val /= n;
         }
     }
 
@@ -288,14 +288,15 @@ fn local_pca(points: &[Point], indices: &[usize]) -> (Vec<f64>, Vec<DVector<f64>
     let mut deflated = cov.clone();
 
     for _ in 0..dim {
-        let (val, vec) = power_iteration(&deflated, dim, 100);
-        eigenvalues.push(val.max(0.0));
+        let (eigenval, vec) = power_iteration(&deflated, dim, 100);
+        eigenvalues.push(eigenval.max(0.0));
         eigenvectors.push(DVector::from_vec(vec));
 
         // Deflate
-        for i in 0..dim {
-            for j in 0..dim {
-                deflated[i][j] -= val * eigenvectors.last().unwrap()[i] * eigenvectors.last().unwrap()[j];
+        let last_ev = eigenvectors.last().unwrap();
+        for (i, row) in deflated.iter_mut().enumerate() {
+            for (j, cell) in row.iter_mut().enumerate() {
+                *cell -= eigenval * last_ev[i] * last_ev[j];
             }
         }
     }

@@ -4,7 +4,6 @@
 //! boundary, the area is bounded below by a constant times the boundary length
 //! raised to the appropriate power.
 
-use nalgebra::DVector;
 use serde::{Serialize, Deserialize};
 use crate::currents::Current;
 use crate::hausdorff::Point;
@@ -84,7 +83,7 @@ pub fn sobolev_constant(n: usize, k: usize) -> f64 {
 ///
 /// h(Ω) = inf |∂A| / min(|A|, |Ω\A|) over all subsets A.
 /// We approximate this for a discrete point cloud.
-pub fn cheeger_constant(points: &[Point], k: usize) -> f64 {
+pub fn cheeger_constant(points: &[Point], _k: usize) -> f64 {
     if points.len() < 2 {
         return 0.0;
     }
@@ -129,7 +128,7 @@ pub fn cheeger_constant(points: &[Point], k: usize) -> f64 {
 }
 
 /// Compute the isoperimetric profile: minimum boundary for each volume.
-pub fn isoperimetric_profile(points: &[Point], k: usize) -> Vec<(f64, f64)> {
+pub fn isoperimetric_profile(points: &[Point], _k: usize) -> Vec<(f64, f64)> {
     let n = points.len();
     if n == 0 { return vec![]; }
 
@@ -169,6 +168,7 @@ pub fn isoperimetric_profile(points: &[Point], k: usize) -> Vec<(f64, f64)> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use nalgebra::DVector;
     use crate::currents::Simplex;
 
     fn pt(x: f64, y: f64) -> Point {

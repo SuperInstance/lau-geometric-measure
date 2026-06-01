@@ -4,7 +4,6 @@
 //! and structure of agent state spaces, which may have fractal or non-integer
 //! dimension.
 
-use nalgebra::DVector;
 use serde::{Serialize, Deserialize};
 use crate::hausdorff::{Point, hausdorff_dimension_auto, hausdorff_measure};
 use crate::rectifiability::{test_rectifiability, Rectifiability};
@@ -46,7 +45,7 @@ pub fn measure_agent_state_space(
 
     // Estimate Hausdorff dimension
     let dim_result = hausdorff_dimension_auto(state_points);
-    let dim_floor = dim_result.dimension.floor() as usize;
+    let _dim_floor = dim_result.dimension.floor() as usize;
     let dim_rounded = dim_result.dimension.round() as usize;
 
     // Check rectifiability
@@ -174,6 +173,7 @@ pub struct StateSpaceComparison {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use nalgebra::DVector;
 
     fn pt(x: f64, y: f64) -> Point {
         DVector::from_vec(vec![x, y])
